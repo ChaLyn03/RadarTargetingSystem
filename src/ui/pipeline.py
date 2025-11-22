@@ -14,13 +14,7 @@ from ..dsp.range_doppler import compute_range_doppler_map, compute_range_fft
 from ..models.cnn import normalize_patch, PatchCNN
 from ..models.dataset import CLASSES
 from ..models.training import run_inference
-from ..sim.fmcw import (
-    SimulationConfig,
-    SimulationResult,
-    Target,
-    generate_random_targets,
-    simulate_frame,
-)
+from ..sim.fmcw import SimulationConfig, SimulationResult, Target, simulate_frame
 
 
 @dataclass
@@ -101,55 +95,4 @@ def run_pipeline(targets: List[Target], config: PipelineConfig, classifier: Patc
         detections=summary.detections,
         classification=classification,
     )
-
-
-def _format_detection(det: Detection, sim: SimulationResult) -> str:
-    return (
-        f"range={sim.ranges_m[int(det.range_idx)]:.2f} m, "
-        f"doppler={sim.doppler_hz[int(det.doppler_idx)]:.1f} Hz, "
-        f"snr={det.snr_db:.1f} dB"
-    )
-
-
-def main() -> None:
-    parser = argparse.ArgumentParser(description="Run a one-off radar pipeline simulation")
-    parser.add_argument("--targets", type=int, default=2, help="number of synthetic targets")
-    parser.add_argument("--noise-db", type=float, default=-20.0, help="noise power in dB")
-    parser.add_argument("--chirps", type=int, default=32, help="chirps per frame")
-    parser.add_argument("--samples", type=int, default=512, help="samples per chirp")
-    parser.add_argument("--no-cfar", action="store_true", help="disable CA-CFAR and use global thresholding")
-    parser.add_argument("--threshold-k", type=float, default=3.0, help="k·sigma for global thresholding")
-    parser.add_argument("--guard", type=int, default=1, help="guard cells for CFAR")
-    parser.add_argument("--train", type=int, default=4, help="training cells for CFAR")
-    args = parser.parse_args()
-
-    sim_config = SimulationConfig(
-        n_chirps=args.chirps,
-        n_samples=args.samples,
-        noise_power_db=args.noise_db,
-    )
-    targets = generate_random_targets(args.targets, sim_config)
-    pipeline_config = PipelineConfig(
-        sim_config=sim_config,
-        use_cfar=not args.no_cfar,
-        threshold_k=args.threshold_k,
-        guard_cells=(args.guard, args.guard),
-        training_cells=(args.train, args.train),
-    )
-
-    output = run_pipeline(targets, pipeline_config)
-    print("Simulation complete\n-------------------")
-    print(f"Targets simulated: {len(targets)}")
-    print(f"Detections found: {len(output.detections)}\n")
-
-    if output.detections:
-        print("Detections (range, Doppler, SNR):")
-        for det in output.detections:
-            print(f"- {_format_detection(det, output.sim)}")
-    else:
-        print("No detections above threshold")
-
-
-if __name__ == "__main__":
-    main()
 

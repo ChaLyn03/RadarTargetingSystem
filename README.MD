@@ -30,23 +30,12 @@ This repository simulates frames of shape `(N_chirps, N_samples)` using this str
 - `notebooks/`, `docs/`: Space for experiments and architecture notes.
 
 ## Quickstart
-1) Create and activate a virtual environment, then install dependencies:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-```
-
-2) Launch the Streamlit dashboard (recommended):
-```bash
 streamlit run app.py
 ```
-
-3) Alternatively, run a one-off pipeline simulation from the CLI for a quick smoke test:
-```bash
-python -m src.ui.pipeline --targets 2 --noise-db -18 --chirps 32 --samples 512
-```
-The CLI prints detected ranges/Doppler bins (with SNR) using either CA-CFAR (default) or a global k·σ threshold when `--no-cfar` is provided.
 
 ## Workflow
 1. **Simulate**: Generate FMCW frames with configurable targets, SNR, and clutter.
