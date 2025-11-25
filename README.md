@@ -34,6 +34,15 @@ Project layout (new)
 
 Pipeline flow
 
+```mermaid
+flowchart LR
+  A[Simulate\n(fmcw_simulator.simulate_frame)] --> B[Process\n(range FFT → Doppler FFT)]
+  B --> C[Detect\n(ca_cfar / threshold)]
+  C --> D[Cluster\n(cluster_detections → Detection)]
+  D --> E[Classify\n(extract patch → PatchCNN)]
+  E --> F[Visualize\n(Streamlit app)]
+```
+
 1. Simulate: `radar_system.sim.fmcw_simulator.simulate_frame()` produces IQ frames and calibration arrays.
 2. Process: `radar_system.dsp.range_doppler` computes range FFT and Doppler FFT to build an RD map.
 3. Detect: `radar_system.detection` offers `ca_cfar()` and a global threshold detector; connected components are clustered into `Detection` objects.

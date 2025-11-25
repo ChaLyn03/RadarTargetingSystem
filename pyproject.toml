@@ -33,6 +33,7 @@ dependencies = [
     "streamlit",
     "plotly",
     "pandas",
+    "PyYAML",
 ]
 
 [project.optional-dependencies]

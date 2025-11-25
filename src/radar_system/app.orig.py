@@ -10,7 +10,6 @@ from radar_system.models import CLASSES
 from radar_system.models.training.train import TrainingConfig, train_quick_classifier
 from radar_system.sim.fmcw_simulator import SimulationConfig, Target, generate_random_targets
 from radar_system.pipeline.pipeline import PipelineConfig, run_pipeline
-from radar_system.config.loader import load_configs
 
 st.set_page_config(page_title="Radar Target Viewer & Classifier", layout="wide")
 
@@ -21,15 +20,14 @@ def get_classifier_state():
     return st.session_state.classifier
 
 
-def train_classifier_ui(device: str, training_cfg: TrainingConfig):
+def train_classifier_ui(device: str):
     st.markdown("### CNN training")
-    epochs = st.slider("Epochs", 1, 10, int(training_cfg.epochs))
-    samples = st.slider("Synthetic samples", 64, 1024, int(training_cfg.num_samples), step=64)
-    patch_size = st.selectbox("Patch size", [16, 32, 48], index=0 if training_cfg.patch_size==16 else 1)
+    epochs = st.slider("Epochs", 1, 5, 2)
+    samples = st.slider("Synthetic samples", 64, 512, 256, step=64)
+    patch_size = st.selectbox("Patch size", [16, 32, 48], index=1)
     if st.button("Train quick CNN"):
         with st.spinner("Training CNN on synthetic RD patches..."):
-            cfg = TrainingConfig(device=training_cfg.device, epochs=epochs, num_samples=samples, patch_size=patch_size)
-            clf = train_quick_classifier(cfg)
+            clf = train_quick_classifier(TrainingConfig(device=device, epochs=epochs, num_samples=samples, patch_size=patch_size))
         st.session_state.classifier = clf
         st.success("Training complete")
 
@@ -80,47 +78,37 @@ def plot_iq(iq: np.ndarray, sample_rate: float):
 
 
 def run_dashboard():
-    # Load configs from YAML files in ./config
-    sim_cfg, pipeline_cfg, training_cfg = load_configs("config")
-
-    st.title("Radar Target Viewer & Classifier (config-driven)")
+    st.title("Radar Target Viewer & Classifier")
     device = "cuda" if torch.cuda.is_available() else "cpu"
-
-    # Sidebar: allow overrides for a few key simulation values
-    st.sidebar.markdown("## Simulation controls (configurable)")
+    st.sidebar.markdown("## Simulation controls")
     n_targets = st.sidebar.slider("Targets", 1, 4, 2)
-    noise_db = st.sidebar.slider("Noise power (dB)", -60.0, 0.0, float(sim_cfg.noise_power_db), step=1.0)
-    n_chirps = st.sidebar.slider("Chirps", 4, 128, int(sim_cfg.n_chirps), step=4)
-    n_samples = st.sidebar.slider("Samples per chirp", 64, 2048, int(sim_cfg.n_samples), step=64)
+    noise_db = st.sidebar.slider("Noise power (dB)", -40.0, 0.0, -20.0, step=1.0)
+    n_chirps = st.sidebar.slider("Chirps", 8, 64, 32, step=8)
+    n_samples = st.sidebar.slider("Samples per chirp", 128, 1024, 512, step=64)
+    use_cfar = st.sidebar.checkbox("Use CA-CFAR", value=True)
+    guard = st.sidebar.slider("Guard cells", 0, 4, 1)
+    training = st.sidebar.slider("Training cells", 1, 6, 4)
+    threshold_k = st.sidebar.slider("Global threshold k·σ", 1.0, 6.0, 3.0, step=0.5)
 
-    # Pipeline settings
-    use_cfar = st.sidebar.checkbox("Use CA-CFAR", value=bool(pipeline_cfg.use_cfar))
-    guard = st.sidebar.slider("Guard cells", 0, 8, int(pipeline_cfg.guard_cells[0]))
-    training_cells = st.sidebar.slider("Training cells", 1, 12, int(pipeline_cfg.training_cells[0]))
-    threshold_k = st.sidebar.slider("Global threshold k·σ", 1.0, 8.0, float(pipeline_cfg.threshold_k), step=0.5)
+    train_classifier_ui(device)
 
-    # Training UI
-    train_classifier_ui(device, training_cfg)
-
-    # Build simulation & pipeline configs (apply possible overrides)
-    sim_cfg.n_chirps = int(n_chirps)
-    sim_cfg.n_samples = int(n_samples)
-    sim_cfg.noise_power_db = float(noise_db)
-
-    pipeline_cfg.use_cfar = bool(use_cfar)
-    pipeline_cfg.guard_cells = (int(guard), int(guard))
-    pipeline_cfg.training_cells = (int(training_cells), int(training_cells))
-    pipeline_cfg.threshold_k = float(threshold_k)
-
-    targets = generate_random_targets(n_targets, sim_cfg)
+    targets = generate_random_targets(n_targets, SimulationConfig(n_chirps=n_chirps, n_samples=n_samples, noise_power_db=noise_db))
 
     if st.button("Simulate & run pipeline"):
+        sim_config = SimulationConfig(n_chirps=n_chirps, n_samples=n_samples, noise_power_db=noise_db)
+        pipeline_config = PipelineConfig(
+            sim_config=sim_config,
+            use_cfar=use_cfar,
+            threshold_k=threshold_k,
+            guard_cells=(guard, guard),
+            training_cells=(training, training),
+        )
         classifier = get_classifier_state()
         with st.spinner("Running radar pipeline..."):
-            output = run_pipeline(targets, pipeline_cfg, classifier=classifier, device=device)
+            output = run_pipeline(targets, pipeline_config, classifier=classifier, device=device)
 
         st.subheader("Raw IQ (first chirp)")
-        plot_iq(output.sim.iq[0], sim_cfg.sample_rate)
+        plot_iq(output.sim.iq[0], sim_config.sample_rate)
 
         st.subheader("Range profile (mean across chirps)")
         range_profile = np.mean(np.abs(output.range_fft), axis=0)
