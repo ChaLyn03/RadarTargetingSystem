@@ -48,7 +48,10 @@ def _extract_patch(power_map: np.ndarray, center: tuple[int, int], size: int) ->
     c_end = min(power_map.shape[1], c + half)
     patch = np.zeros((size, size), dtype=np.float32)
     patch_slice = power_map[r_start:r_end, c_start:c_end]
-    patch[: patch_slice.shape[0], : patch_slice.shape[1]] = patch_slice
+    # Place the slice so that the detection stays centered even near borders
+    dest_r_start = half - (r - r_start)
+    dest_c_start = half - (c - c_start)
+    patch[dest_r_start:dest_r_start + patch_slice.shape[0], dest_c_start:dest_c_start + patch_slice.shape[1]] = patch_slice
     return patch
 
 

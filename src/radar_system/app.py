@@ -25,10 +25,12 @@ def train_classifier_ui(device: str, training_cfg: TrainingConfig):
     st.markdown("### CNN training")
     epochs = st.slider("Epochs", 1, 10, int(training_cfg.epochs))
     samples = st.slider("Synthetic samples", 64, 1024, int(training_cfg.num_samples), step=64)
-    patch_size = st.selectbox("Patch size", [16, 32, 48], index=0 if training_cfg.patch_size==16 else 1)
+    patch_options = [16, 32, 48]
+    default_idx = patch_options.index(training_cfg.patch_size) if training_cfg.patch_size in patch_options else 1
+    patch_size = st.selectbox("Patch size", patch_options, index=default_idx)
     if st.button("Train quick CNN"):
         with st.spinner("Training CNN on synthetic RD patches..."):
-            cfg = TrainingConfig(device=training_cfg.device, epochs=epochs, num_samples=samples, patch_size=patch_size)
+            cfg = TrainingConfig(device=device, epochs=epochs, num_samples=samples, patch_size=patch_size)
             clf = train_quick_classifier(cfg)
         st.session_state.classifier = clf
         st.success("Training complete")

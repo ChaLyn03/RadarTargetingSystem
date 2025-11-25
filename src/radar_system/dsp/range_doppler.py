@@ -14,7 +14,8 @@ def compute_range_fft(iq: np.ndarray, window_type: str | None = "hann") -> np.nd
 def compute_range_doppler_map(iq: np.ndarray, window_type: str | None = "hann") -> np.ndarray:
     range_fft = compute_range_fft(iq, window_type=window_type)
     doppler_fft = np.fft.fftshift(np.fft.fft(range_fft, axis=0), axes=0)
-    return doppler_fft
+    # Return with range on axis 0 and Doppler on axis 1 for consistency elsewhere
+    return doppler_fft.T
 
 
 def compute_spectrogram(iq: np.ndarray, sample_rate: float, nperseg: int = 128, noverlap: int = 64):

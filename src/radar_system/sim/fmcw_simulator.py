@@ -72,7 +72,7 @@ def simulate_frame(config: SimulationConfig, targets: Iterable[Target]) -> Simul
     iq += noise
 
     ranges_m = np.linspace(0, C * config.sweep_time / (2 * config.sweep_bandwidth), config.n_samples, endpoint=False)
-    doppler_hz = np.fft.fftfreq(config.n_chirps, d=config.sweep_time)
+    doppler_hz = np.fft.fftshift(np.fft.fftfreq(config.n_chirps, d=config.sweep_time))
 
     return SimulationResult(iq=iq, ranges_m=ranges_m, doppler_hz=doppler_hz, targets=list(targets))
 
