@@ -1,9 +1,18 @@
+import os
+import sys
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 import torch
+
+# Allow running the app directly from the repo without installation
+SRC_ROOT = Path(__file__).resolve().parents[1]
+if str(SRC_ROOT) not in sys.path:
+    sys.path.insert(0, str(SRC_ROOT))
 
 from radar_system.detection.clustering import Detection
 from radar_system.models import CLASSES

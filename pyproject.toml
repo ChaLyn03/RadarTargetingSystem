@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-    {name = "ChaLyn03", email = ""}
+    {name = "ChaLyn03", email = "dev@localhost"}
 ]
 keywords = ["radar", "fmcw", "signal-processing", "detection", "cnn", "streamlit"]
 classifiers = [
