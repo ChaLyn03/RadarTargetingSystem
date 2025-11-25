@@ -31,4 +31,3 @@ def cluster_detections(power_map: np.ndarray, detection_mask: np.ndarray) -> Det
         r_idx, d_idx = center_of_mass(power_map, labels=labeled, index=label_id)
         detections.append(Detection(range_idx=float(r_idx), doppler_idx=float(d_idx), strength=float(strength)))
     return DetectionSummary(detections=detections, mask=labeled)
-

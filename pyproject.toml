@@ -1,0 +1,124 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "radar-targeting-system"
+version = "0.1.0"
+description = "End-to-end FMCW radar demonstrator with DSP, detection, and CNN classification"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [
+    {name = "ChaLyn03", email = ""}
+]
+keywords = ["radar", "fmcw", "signal-processing", "detection", "cnn", "streamlit"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "numpy",
+    "scipy",
+    "torch",
+    "streamlit",
+    "plotly",
+    "pandas",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov",
+    "black>=23.0",
+    "isort>=5.0",
+    "flake8>=6.0",
+    "mypy>=1.0",
+    "pylint>=3.0",
+]
+test = [
+    "pytest>=7.0",
+    "pytest-cov",
+]
+docs = [
+    "sphinx>=5.0",
+    "sphinx-rtd-theme",
+]
+
+[project.urls]
+Homepage = "https://github.com/ChaLyn03/RadarTargetingSystem"
+Documentation = "https://github.com/ChaLyn03/RadarTargetingSystem#readme"
+Repository = "https://github.com/ChaLyn03/RadarTargetingSystem.git"
+"Issue Tracker" = "https://github.com/ChaLyn03/RadarTargetingSystem/issues"
+
+[tool.setuptools]
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["radar_system*"]
+
+[tool.black]
+line-length = 120
+target-version = ["py39", "py310", "py311"]
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 120
+py_version = 39
+skip_gitignore = true
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = false
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = "-v --strict-markers"
+markers = [
+    "slow: marks tests as slow",
+    "integration: marks tests as integration tests",
+]
+
+[tool.pylint.messages_control]
+disable = [
+    "C0330", "C0326",  # bad-whitespace
+    "R0903",           # too-few-public-methods
+    "R0913",           # too-many-arguments
+    "W0212",           # protected-access
+]
+
+[tool.pylint.format]
+max-line-length = 120

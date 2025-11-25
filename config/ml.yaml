@@ -1,0 +1,7 @@
+training:
+  lr: 0.001
+  epochs: 3
+  batch_size: 32
+  device: cpu
+  num_samples: 256
+  patch_size: 32

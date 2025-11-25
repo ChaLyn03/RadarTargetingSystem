@@ -1,20 +1,19 @@
 from __future__ import annotations
 
-import argparse
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
 import numpy as np
 import torch
 
-from ..detection.cfar import ca_cfar
-from ..detection.clustering import cluster_detections, Detection
-from ..detection.threshold import global_threshold
-from ..dsp.range_doppler import compute_range_doppler_map, compute_range_fft
-from ..models.cnn import normalize_patch, PatchCNN
-from ..models.dataset import CLASSES
-from ..models.training import run_inference
-from ..sim.fmcw import SimulationConfig, SimulationResult, Target, simulate_frame
+from radar_system.detection.cfar import ca_cfar
+from radar_system.detection.clustering import cluster_detections, Detection
+from radar_system.detection.threshold import global_threshold
+from radar_system.dsp.range_doppler import compute_range_doppler_map, compute_range_fft
+from radar_system.models.architecture.cnn import normalize_patch, PatchCNN
+from radar_system.models import CLASSES
+from radar_system.models.training.train import run_inference
+from radar_system.sim.fmcw_simulator import SimulationConfig, SimulationResult, Target, simulate_frame
 
 
 @dataclass
@@ -95,4 +94,3 @@ def run_pipeline(targets: List[Target], config: PipelineConfig, classifier: Patc
         detections=summary.detections,
         classification=classification,
     )
-

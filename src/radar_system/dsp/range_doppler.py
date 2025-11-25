@@ -20,4 +20,3 @@ def compute_range_doppler_map(iq: np.ndarray, window_type: str | None = "hann") 
 def compute_spectrogram(iq: np.ndarray, sample_rate: float, nperseg: int = 128, noverlap: int = 64):
     _, _, Zxx = stft(iq, fs=sample_rate, window="hann", nperseg=nperseg, noverlap=noverlap, return_onesided=False)
     return Zxx
-

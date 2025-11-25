@@ -32,4 +32,3 @@ def ca_cfar(power_map: np.ndarray, guard_cells: tuple[int, int] = (1, 1), traini
             detections[r, c] = power_map[r, c] > threshold
 
     return detections
-

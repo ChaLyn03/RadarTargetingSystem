@@ -88,4 +88,3 @@ def generate_random_targets(num_targets: int, config: SimulationConfig, rng: np.
         micro_doppler_hz = rng.uniform(0.0, 40.0)
         targets.append(Target(range_m=range_m, velocity_mps=velocity_mps, rcs=rcs, micro_doppler_hz=micro_doppler_hz))
     return targets
-

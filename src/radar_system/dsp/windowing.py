@@ -18,4 +18,3 @@ def apply_window(iq: np.ndarray, window_type: str = "hann", axis: int = -1) -> n
     reshaped[axis] = -1
     window = window.reshape(reshaped)
     return iq * window
-

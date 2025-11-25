@@ -1,0 +1,8 @@
+pipeline:
+  window_type: hann
+  use_cfar: true
+  threshold_k: 3.0
+  guard_cells: [1, 1]
+  training_cells: [4, 4]
+  cfar_rate: 1.4
+  patch_size: 32

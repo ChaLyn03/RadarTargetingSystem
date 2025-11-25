@@ -1,0 +1,10 @@
+simulation:
+  sample_rate: 2000000.0
+  sweep_bandwidth: 150000000.0
+  sweep_time: 0.001
+  carrier_freq: 77000000000.0
+  n_chirps: 32
+  n_samples: 512
+  noise_power_db: -20.0
+  random_seed: 0
+  wobble_scale: 0.25

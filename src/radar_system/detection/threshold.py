@@ -8,4 +8,3 @@ def global_threshold(power_map: np.ndarray, k_sigma: float = 3.0) -> np.ndarray:
     std = power_map.std()
     threshold = mean + k_sigma * std
     return power_map > threshold
-
